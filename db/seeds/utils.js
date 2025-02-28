@@ -7,3 +7,13 @@ exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
 
 
 
+exports.createLookupTable = (array, key1, key2) => {
+  const lookUp ={}
+  array.forEach((object)=>{
+    lookUp[object[key1]] = object[key2]
+})
+ 
+  return lookUp;
+};
+
+
