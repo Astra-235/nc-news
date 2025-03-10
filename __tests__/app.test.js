@@ -6,7 +6,7 @@ const request = require("supertest");
 const app = require("../app.js");
 /* Set up your test imports here */
 
-beforeAll(() => seed(data));
+beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe("GET /api", () => {
@@ -62,7 +62,7 @@ describe("Unrecognised path", () => {
   });
 })
 
-describe.only("GET /api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200: Responds with the single article specified by the article_id ", () => {
     return request(app)
       .get("/api/articles/3")
