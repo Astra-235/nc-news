@@ -62,23 +62,36 @@ describe("Unrecognised path", () => {
   });
 })
 
-// INSERT INTO table_name (column1, column2, column3, ...)
-// VALUES (value1, value2, value3, ...);
-// /api/topics.
-// [
-//   {
-//     description: 'The man, the Mitch, the legend',
-//     slug: 'mitch',
-//     img_url: ""
-//   },
-//   {
-//     description: 'Not dogs',
-//     slug: 'cats',
-//     img_url: ""
-//   },
-//   {
-//     description: 'what books are made of',
-//     slug: 'paper',
-//     img_url: ""
-//   }
-// ];
+describe.only("GET /api/articles/:article_id", () => {
+  test("200: Responds with the single article specified by the article_id ", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body:{article} }) => {
+        expect(Object.keys(article).length).toBe(8);
+        expect(article.author).toBe("icellusedkars");
+        expect(article.title).toBe("Eight pug gifs that remind me of mitch");
+        expect(article.votes).toBe(0);
+      });
+  });
+  test("200: responds with message `No article with that article ID` when no article with specified ID exists on the database", () => {
+    return request(app)
+      .get("/api/articles/24")
+      .expect(200)
+      .then(({ body: {msg} }) => {
+        console.log(msg, '<-- in test')
+        expect(msg).toBe('No article with that article ID');
+  
+      });
+  });
+  test("200: responds with message `Article ID incorrectly entered - must be an integer` when no article with specified ID exists on the database", () => {
+    return request(app)
+      .get("/api/articles/InCoRrEcT_Id")
+      .expect(404)
+      .then(({ body: {msg} }) => {
+        //console.log(msg, '<-- in test')
+        expect(msg).toBe(`Article ID incorrectly entered - must be an integer`);
+  
+      });
+  });
+})
