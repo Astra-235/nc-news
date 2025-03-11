@@ -9,7 +9,9 @@ const app = express()
 
 app.get('/api', getApiEndpoints)
 app.get('/api/topics', getTopics)
+app.get('/api/articles', getArticles)
 app.get('/api/articles/:article_id', getArticles)
+
 
 app.use(handlePsqlErrors)
 app.use(handleCustomErrors)
