@@ -1,10 +1,20 @@
 const db = require("../../connection");
 const checkExists = require("../../../utils.js");
 
-const fetchComments = (article_id) => {
-  
 
+const addComments = (article_id, username, comment)=>{
     return db
+    .query(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`, [article_id, username, comment])
+    .then(({rows})=>{
+        return rows[0]
+    })
+}
+
+
+
+
+const fetchComments = (article_id) => {
+      return db
       .query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`, [article_id])
       .then(({rows})=>{
         if(rows.length > 0){return rows}
@@ -20,6 +30,8 @@ const fetchComments = (article_id) => {
         //200: article exists, comments exist
             if(answer.length > 0) {return answer}
         })    
-     
     }
-module.exports = fetchComments;
+
+
+
+module.exports = {fetchComments, addComments};
