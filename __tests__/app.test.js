@@ -45,15 +45,13 @@ describe("Unrecognised path", () => {
   });
 })
 
-describe.only("GET /api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200: Responds with the single article specified by the article_id ", () => {
     return request(app)
       .get("/api/articles/3")
       .expect(200)
       .then(({ body:{articles} }) => {
 
-        console.log(typeof new Date(1604394720000), '<--- test1')
-        console.log(typeof articles.created_at, '<--- test2')
 
         expect(articles.article_id).toBe(3)
         expect(articles).toMatchObject({
@@ -78,8 +76,8 @@ describe.only("GET /api/articles/:article_id", () => {
 
   test("404: Not Found - responds with message `No article with that article ID` when no article with specified ID exists on the database", () => {
     return request(app)
-      .get("/api/articles/24")
-      .expect(200)
+      .get("/api/articles/34")
+      .expect(404)
       .then(({ body: {msg} }) => {
         expect(msg).toBe('No article with that article ID');
   
@@ -88,7 +86,7 @@ describe.only("GET /api/articles/:article_id", () => {
   test("400: Bad Request - responds with message `Article ID incorrectly entered` when no article with specified ID exists on the database", () => {
     return request(app)
       .get("/api/articles/InCoRrEcT_Id")
-      .expect(404)
+      .expect(400)
       .then(({ body: {msg} }) => {
         expect(msg).toBe(`Article ID incorrectly entered`);
   
@@ -131,4 +129,62 @@ describe("GET /api/articles/", () => {
 
       });
   });
+})
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of all the comments for the specified article ID", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body:{comments} }) => {
+        //correct properties in each article
+        for(let i=0; i<comments.length-1; i++){
+          expect(Object.keys(comments[i])).toContain("comment_id");
+          expect(Object.keys(comments[i])).toContain("votes");
+          expect(Object.keys(comments[i])).toContain("created_at");
+          expect(Object.keys(comments[i])).toContain("author");
+          expect(Object.keys(comments[i])).toContain("body");
+          expect(Object.keys(comments[i])).toContain("article_id");
+
+
+          //articles are listed in descending order of date (most recent first)
+          expect(Date.parse(comments[i].created_at)).not.toBeLessThan(Date.parse(comments[i+1].created_at))
+
+          //all returned comments are for the specified article ID
+          expect(comments[i].article_id).toBe(1)
+
+        }
+
+
+      });
+  });
+  test("400: if a non-integer value is entered for the article_id, an error message is returned", ()=>{
+    return request(app)
+    .get("/api/articles/SwissCheese/comments")
+    .expect(400)
+    .then(({body:{msg}}) => {
+      expect(msg).toBe("Article ID incorrectly entered")
+    })
+  })
+  
+
+  test("404: Not Found - responds with message `No article with that article ID` when no article with specified ID exists on the database", () => {
+    return request(app)
+      .get("/api/articles/101/comments")
+      .expect(404)
+      .then(({ body: {msg} }) => {
+        expect(msg).toBe('No article with that article ID');
+      });
+    })
+
+    test("200: returns an empty array when passed an existing article_id that has no comments attributed to it", () => {
+      return request(app)
+        .get("/api/articles/7/comments")
+        .expect(200)
+        .then(({ body: {comments} }) => {
+        expect(comments.length).toBe(0);
+    
+        });
+      }) 
+
 })
