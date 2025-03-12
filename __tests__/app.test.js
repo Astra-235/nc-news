@@ -177,7 +177,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("200: correctly posts a comment and attributes it with the next available comment_id when imputted with an existing article_id, an existing username, and a string-formatted body", () => {
     return request(app)
       .post("/api/articles/5/comments")
@@ -236,7 +236,7 @@ describe.only("POST /api/articles/:article_id/comments", () => {
   });
 
  
-  test("404: body not submitted with POST request", () => {
+  test("400: body not submitted with POST request", () => {
     return request(app)
       .post("/api/articles/8/comments")
       .send({
@@ -251,4 +251,67 @@ describe.only("POST /api/articles/:article_id/comments", () => {
  
 
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: takes an article, specified by ID, ammends the number of votes by a given amount, and returns the newly-ammended article", () => {
+    return request(app)
+      .patch("/api/articles/7")
+      .send({ 
+        inc_votes: 12 
+      })
+      .expect(200)
+      .then(({ body: {article} }) => {
+        expect(article.article_id).toBe(7);
+        expect(article.votes).toBe(12);
+        expect(Object.keys(article)).toContain("title");
+        expect(Object.keys(article)).toContain("topic");
+        expect(Object.keys(article)).toContain("title");
+        expect(Object.keys(article)).toContain("author");
+        expect(Object.keys(article)).toContain("body");
+        expect(Object.keys(article)).toContain("created_at");
+        expect(Object.keys(article)).toContain("article_img_url");
+      });
+  })
+
+  test("400: a non-integer value was entered for article_id ", () => {
+    return request(app)
+      .patch("/api/articles/blueCheese")
+      .send({ 
+        inc_votes: 12 
+      })
+      .expect(400)
+      .then(({body: {msg}} ) => {
+        expect(msg).toBe(`Article ID incorrectly entered`);
+      });
+  })
+
+
+  test("404: article not found", () => {
+    return request(app)
+    .patch("/api/articles/99")
+    .send({ 
+      inc_votes: 12 
+    })
+    .expect(404)
+    .then(({body: {msg}} ) => {
+      expect(msg).toBe(`an input field is referencing a non-existent entity e.g.username or article does not exist`);
+    });
+  });
+
+  test("400: inc_votes not included in body of patch", () => {
+    return request(app)
+    .patch("/api/articles/99")
+    .send({  
+    })
+    .expect(400)
+    .then(({body: {msg}} ) => {
+      expect(msg).toBe(`inc_votes missing from patch request`);
+    });
+  });
+
+
+})
+
+
+
 
