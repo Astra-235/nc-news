@@ -2,7 +2,7 @@ const express = require('express')
 const getApiEndpoints = require('./db/MVC/Controllers/api.controllers.js')
 const getTopics = require('./db/MVC/Controllers/topics.controllers.js')
 const {getArticles, patchArticle} = require('./db/MVC/Controllers/articles.controllers.js')
-const {getComments, postComments} = require('./db/MVC/Controllers/comments.controllers.js')
+const {getComments, postComments, deleteComment} = require('./db/MVC/Controllers/comments.controllers.js')
 const {handleNoEndpoint, handleCustomErrors, handlePsqlErrors} = require('./db/MVC/Controllers/error.controllers.js')
 
 const app = express()
@@ -20,6 +20,9 @@ app.get('/api/articles/:article_id/comments', getComments)
 app.post('/api/articles/:article_id/comments', postComments)
 
 app.patch('/api/articles/:article_id', patchArticle)
+
+app.delete('/api/comments/:comment_id', deleteComment)
+
 
 app.use(handlePsqlErrors)
 app.use(handleCustomErrors)
