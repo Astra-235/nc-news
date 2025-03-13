@@ -103,11 +103,26 @@
     "description": "takes a comment_id and deletes the existing comment with that ID",
     "queries": [],
     "exampleResponse": {
-      "comment": {}
+      "comments": {}
       
     }
-  }
+  },
+
+  "GET /api/users": {
+    "description": "returns an array of all the users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "sam": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        }
+      ]
+    }
+
 
 
 }
 
+}
