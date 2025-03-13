@@ -351,13 +351,28 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(msg).toBe(`parameter incorrectly entered`);
       });
   })
-
 })
 
-// be available on /api/comments/:comment_id.
-// delete the given comment by comment_id.
-// Responds with:
 
-// status 204 and no content.
+describe("GET /api/users", () => {
+  test("200: returns an array of all the users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({body: {users}})=>{
+        for(let i=0; i<users.length; i++){
+        //return information has the right properties
+        expect(Object.keys(users[i])).toContain("username");
+        expect(Object.keys(users[i])).toContain("name");
+        expect(Object.keys(users[i])).toContain("avatar_url");
+        //number of returned users is equal to the number of users in the test data set
+        expect(users.length).toBe(data.userData.length)
+        }
+      })
+
+
+    })
+  })
+
 
 
