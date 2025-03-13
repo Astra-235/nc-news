@@ -4,7 +4,7 @@ const fetchArticles = require("../Models/articles.models.js")
 const handlePsqlErrors = (err, req, res, next) => {
     //if the query criterion was was malformed
     if(err.code === '22P02'){
-        res.status(400).send({msg: `Article ID incorrectly entered`})
+        res.status(400).send({msg: `parameter incorrectly entered`})
     
     //if a foreign key violation, meaning a referenced row does not exist in the referenced table. This error is usually caused by an INSERT or UPDATE statement that references a non-existent row.
     } else if (err.code === '23503'){

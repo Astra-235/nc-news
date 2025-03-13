@@ -1,5 +1,18 @@
 const db = require("../../connection");
-const checkExists = require("../../../utils.js");
+const {checkExists} = require("../../../utils.js");
+
+
+const deleteCommentById = (comment_id) => {
+    return db
+    .query(`DELETE FROM comments
+        WHERE comment_id = $1`,
+        [comment_id]
+        )
+    
+
+}
+
+
 
 
 const addComments = (article_id, username, comment)=>{
@@ -34,4 +47,4 @@ const fetchComments = (article_id) => {
 
 
 
-module.exports = {fetchComments, addComments};
+module.exports = {fetchComments, addComments, deleteCommentById};

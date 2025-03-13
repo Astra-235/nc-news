@@ -4,6 +4,8 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const request = require("supertest");
 const app = require("../app.js");
+const {retrieveComments} = require("../utils.js");
+const { addComments } = require("../db/MVC/Models/comments.models.js");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -82,7 +84,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/InCoRrEcT_Id")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe(`Article ID incorrectly entered`);
+        expect(msg).toBe(`parameter incorrectly entered`);
       });
   });
 });
@@ -154,7 +156,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/SwissCheese/comments")
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Article ID incorrectly entered");
+        expect(msg).toBe(`parameter incorrectly entered`);
       });
   });
 
@@ -205,7 +207,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe(`Article ID incorrectly entered`);
+        expect(body.msg).toBe(`parameter incorrectly entered`);
       });
   });
 
@@ -244,7 +246,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(400)
       .then(({ body }) => {
-        console.log(body.msg, '<-- in test')
         expect(body.msg).toBe(`a NULL value has been assigned to a column with a NOT NULL contraint  e.g.no body submitted with a POST request`);
       });
   });
@@ -281,7 +282,7 @@ describe("PATCH /api/articles/:article_id", () => {
       })
       .expect(400)
       .then(({body: {msg}} ) => {
-        expect(msg).toBe(`Article ID incorrectly entered`);
+        expect(msg).toBe(`parameter incorrectly entered`);
       });
   })
 
@@ -309,9 +310,54 @@ describe("PATCH /api/articles/:article_id", () => {
     });
   });
 
-
 })
 
 
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: if comment with specified id exists in comments table, then  deletes it from the table; no content is returned", () => {
+    return request(app)
+      .delete("/api/comments/7")
+      .expect(204)
+      .then(({body})=>{
+
+        //the body returned by the server is an empty object
+        expect(body).toEqual({})
+
+      })
+      .then(() => {
+        return retrieveComments()
+      })
+      .then((comments)=>{
+
+        //the total number of comments should now be one less than in the original data set
+        expect(comments.length).toBe(data.commentData.length -1)
+
+      })
+  })
+  test("404: comment not found", () => {
+    return request(app)
+    .delete("/api/comments/99")
+    .expect(404)
+    .then(({body: {msg}} ) => {
+      expect(msg).toBe(`an input field is referencing a non-existent entity e.g.username or article does not exist`);
+    });
+  });
+
+  test("400: a non-integer value was entered for comment_id ", () => {
+    return request(app)
+      .delete("/api/comments/blueCheese")
+      .expect(400)
+      .then(({body: {msg}} ) => {
+        expect(msg).toBe(`parameter incorrectly entered`);
+      });
+  })
+
+})
+
+// be available on /api/comments/:comment_id.
+// delete the given comment by comment_id.
+// Responds with:
+
+// status 204 and no content.
 
 

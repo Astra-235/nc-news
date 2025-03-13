@@ -98,6 +98,14 @@
       ]
       
     }
+  },
+  "DELETE /api/comments/:comments_id": {
+    "description": "takes a comment_id and deletes the existing comment with that ID",
+    "queries": [],
+    "exampleResponse": {
+      "comment": {}
+      
+    }
   }
 
 

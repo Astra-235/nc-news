@@ -9,7 +9,14 @@ const checkExists = async (table, column, value) => {
     {return "No_article"} else {return "Article_exists"}
     }
 
+const retrieveComments = () => {
+    return db
+    .query('SELECT * FROM comments')
+    .then(({rows})=>{
+        return rows
+    })
+
+}
 
 
-
-module.exports = checkExists
+module.exports = {checkExists, retrieveComments}
