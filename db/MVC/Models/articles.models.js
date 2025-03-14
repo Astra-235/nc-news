@@ -36,7 +36,9 @@ const patchArticleVotes = (article_id, inc_votes) => {
 
 
 const fetchAllArticles = (fetchquery) => {
-  return db.query(fetchquery).then(({ rows }) => {
+  return db.query(fetchquery)
+  .then(({ rows }) => {
+    console.log(rows)
     return rows;
   });
 };

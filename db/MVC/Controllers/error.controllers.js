@@ -18,7 +18,7 @@ const handlePsqlErrors = (err, req, res, next) => {
         res.status(400).send({msg: `syntax error, check query terms are valid`})
     //path contains a query which references a non-existent column in the database tables
     } else if (err.code === '42703'){
-        res.status(400).send({msg: `undefined column name`})
+        res.status(404).send({msg: `undefined column name`})
 
 
 
