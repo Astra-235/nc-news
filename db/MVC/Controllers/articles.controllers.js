@@ -54,19 +54,31 @@ const getArticles = (req, res, next) => {
     } else {
       sortOrder = "DESC";
     }
-    const fetchquery = format(
-      "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY %I %s",
-      sortBy,
-      sortOrder
-    );
-    fetchAllArticles(fetchquery)
+    let fetchquery
+    if(queries.topic){
+      fetchquery = format(
+        "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE topic = %L GROUP BY articles.article_id ORDER BY %I %s",
+        queries.topic,
+        sortBy,
+        sortOrder)
+    } else {
+      fetchquery = format(
+        "SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY %I %s",
+        sortBy,
+        sortOrder)
+    };
+    //if a topic condition has been included by client, then filter articles by this topic
+     fetchAllArticles(fetchquery)
       .then((articles) => {
         res.status(200).send({ articles: articles });
       })
       .catch((err) => {
+        console.log(err, '<--- err-block in articles.controllers')
         next(err);
       });
   }
 };
+
+
 
 module.exports = { getArticles, patchArticle };

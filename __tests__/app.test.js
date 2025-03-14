@@ -4,7 +4,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const request = require("supertest");
 const app = require("../app.js");
-const {retrieveComments} = require("../utils.js");
+const { retrieveComments } = require("../utils.js");
 const { addComments } = require("../db/MVC/Models/comments.models.js");
 
 beforeEach(() => seed(data));
@@ -189,7 +189,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(200)
       .then(({ body }) => {
-
         expect(body.comment.article_id).toBe(5);
         expect(body.comment.author).toBe("butter_bridge");
         expect(body.comment.body).toBe("this is a prime example");
@@ -220,7 +219,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe(`an input field is referencing a non-existent entity e.g.username or article does not exist`);
+        expect(body.msg).toBe(
+          `an input field is referencing a non-existent entity e.g.username or article does not exist`
+        );
       });
   });
 
@@ -233,35 +234,36 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe(`an input field is referencing a non-existent entity e.g.username or article does not exist`);
+        expect(body.msg).toBe(
+          `an input field is referencing a non-existent entity e.g.username or article does not exist`
+        );
       });
   });
 
- 
   test("400: body not submitted with POST request", () => {
     return request(app)
       .post("/api/articles/8/comments")
       .send({
-        username: "butter_bridge"
+        username: "butter_bridge",
       })
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe(`a NULL value has been assigned to a column with a NOT NULL contraint  e.g.no body submitted with a POST request`);
+        expect(body.msg).toBe(
+          `a NULL value has been assigned to a column with a NOT NULL contraint  e.g.no body submitted with a POST request`
+        );
       });
   });
- 
-
 });
 
 describe("PATCH /api/articles/:article_id", () => {
   test("200: takes an article, specified by ID, ammends the number of votes by a given amount, and returns the newly-ammended article", () => {
     return request(app)
       .patch("/api/articles/7")
-      .send({ 
-        inc_votes: 12 
+      .send({
+        inc_votes: 12,
       })
       .expect(200)
-      .then(({ body: {article} }) => {
+      .then(({ body: { article } }) => {
         expect(article.article_id).toBe(7);
         expect(article.votes).toBe(12);
         expect(Object.keys(article)).toContain("title");
@@ -272,174 +274,208 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(Object.keys(article)).toContain("created_at");
         expect(Object.keys(article)).toContain("article_img_url");
       });
-  })
+  });
 
   test("400: a non-integer value was entered for article_id ", () => {
     return request(app)
       .patch("/api/articles/blueCheese")
-      .send({ 
-        inc_votes: 12 
+      .send({
+        inc_votes: 12,
       })
       .expect(400)
-      .then(({body: {msg}} ) => {
+      .then(({ body: { msg } }) => {
         expect(msg).toBe(`parameter incorrectly entered`);
       });
-  })
-
+  });
 
   test("404: article not found", () => {
     return request(app)
-    .patch("/api/articles/99")
-    .send({ 
-      inc_votes: 12 
-    })
-    .expect(404)
-    .then(({body: {msg}} ) => {
-      expect(msg).toBe(`an input field is referencing a non-existent entity e.g.username or article does not exist`);
-    });
+      .patch("/api/articles/99")
+      .send({
+        inc_votes: 12,
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(
+          `an input field is referencing a non-existent entity e.g.username or article does not exist`
+        );
+      });
   });
 
   test("400: inc_votes not included in body of patch", () => {
     return request(app)
-    .patch("/api/articles/99")
-    .send({  
-    })
-    .expect(400)
-    .then(({body: {msg}} ) => {
-      expect(msg).toBe(`inc_votes missing from patch request`);
-    });
+      .patch("/api/articles/99")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(`inc_votes missing from patch request`);
+      });
   });
-
-})
-
+});
 
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: if comment with specified id exists in comments table, then  deletes it from the table; no content is returned", () => {
     return request(app)
       .delete("/api/comments/7")
       .expect(204)
-      .then(({body})=>{
-
+      .then(({ body }) => {
         //the body returned by the server is an empty object
-        expect(body).toEqual({})
-
+        expect(body).toEqual({});
       })
       .then(() => {
-        return retrieveComments()
+        return retrieveComments();
       })
-      .then((comments)=>{
-
+      .then((comments) => {
         //the total number of comments should now be one less than in the original data set
-        expect(comments.length).toBe(data.commentData.length -1)
-
-      })
-  })
+        expect(comments.length).toBe(data.commentData.length - 1);
+      });
+  });
   test("404: comment not found", () => {
     return request(app)
-    .delete("/api/comments/99")
-    .expect(404)
-    .then(({body: {msg}} ) => {
-      expect(msg).toBe(`an input field is referencing a non-existent entity e.g.username or article does not exist`);
-    });
+      .delete("/api/comments/99")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(
+          `an input field is referencing a non-existent entity e.g.username or article does not exist`
+        );
+      });
   });
 
   test("400: a non-integer value was entered for comment_id ", () => {
     return request(app)
       .delete("/api/comments/blueCheese")
       .expect(400)
-      .then(({body: {msg}} ) => {
+      .then(({ body: { msg } }) => {
         expect(msg).toBe(`parameter incorrectly entered`);
       });
-  })
-})
-
+  });
+});
 
 describe("GET /api/users", () => {
   test("200: returns an array of all the users", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
-      .then(({body: {users}})=>{
-        for(let i=0; i<users.length; i++){
-        //return information has the right properties
-        expect(Object.keys(users[i])).toContain("username");
-        expect(Object.keys(users[i])).toContain("name");
-        expect(Object.keys(users[i])).toContain("avatar_url");
-        //number of returned users is equal to the number of users in the test data set
-        expect(users.length).toBe(data.userData.length)
+      .then(({ body: { users } }) => {
+        for (let i = 0; i < users.length; i++) {
+          //return information has the right properties
+          expect(Object.keys(users[i])).toContain("username");
+          expect(Object.keys(users[i])).toContain("name");
+          expect(Object.keys(users[i])).toContain("avatar_url");
+          //number of returned users is equal to the number of users in the test data set
+          expect(users.length).toBe(data.userData.length);
         }
-      })
-    })
-
-})
-
+      });
+  });
+});
 
 describe("GET /api/articles?sort_by=[field]", () => {
   test("200: returns an array of all the articles sorted by topic  descending order", () => {
     return request(app)
       .get("/api/articles?sort_by=topic&order=DESC")
       .expect(200)
-      .then(({body: {articles}})=>{
-        for(let i=0; i<articles.length-1; i++){{
-          expect(articles[i].topic.charCodeAt(0)).not.toBeLessThan(articles[i+1].topic.charCodeAt(0));
-        }}
-        })
-    })
+      .then(({ body: { articles } }) => {
+        for (let i = 0; i < articles.length - 1; i++) {
+          {
+            expect(articles[i].topic.charCodeAt(0)).not.toBeLessThan(
+              articles[i + 1].topic.charCodeAt(0)
+            );
+          }
+        }
+      });
+  });
 
-    test("200: returns an array of all the articles sorted by title  ascending order", () => {
-      return request(app)
-        .get("/api/articles?sort_by=title&order=ASC")
-        .expect(200)
-        .then(({body: {articles}})=>{
-        for(let i=0; i<articles.length-1; i++){{
-         expect(articles[i].title.charCodeAt(0)).not.toBeGreaterThan(articles[i+1].title.charCodeAt(0));
-          }}
-          })
+  test("200: returns an array of all the articles sorted by title  ascending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        for (let i = 0; i < articles.length - 1; i++) {
+          {
+            expect(articles[i].title.charCodeAt(0)).not.toBeGreaterThan(
+              articles[i + 1].title.charCodeAt(0)
+            );
+          }
+        }
+      });
+  });
+
+  test("200: returns an array of all the articles, default sorted by created_at, in ascending order", () => {
+    return request(app)
+      .get("/api/articles?order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        for (let i = 0; i < articles.length - 1; i++) {
+          expect(Date.parse(articles[i].created_at)).not.toBeGreaterThan(
+            Date.parse(articles[i + 1].created_at)
+          );
+        }
+      });
+  });
+
+  test("400: returns an error message if the 'order' term is neither ASC nor DESC", () => {
+    return request(app)
+      .get("/api/articles?order=XXX")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(`syntax error, check query terms are valid`);
+      });
+  });
+
+  test("404: returns an error message if client tries to sort_by a non-existent column name", () => {
+    return request(app)
+      .get("/api/articles?sort_by=sauce")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(`undefined column name`);
+      });
+  });
+
+  test("200: if client makes a query other than 'sort_by' (e.g. 'arrange_by') then the query is ignored, and sorting defaults to created_at DESC", () => {
+    return request(app)
+      .get("/api/articles?arrange_by=topic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        for (let i = 0; i < articles.length - 1; i++) {
+          expect(Date.parse(articles[i].created_at)).not.toBeLessThan(
+            Date.parse(articles[i + 1].created_at)
+          );
+        }
+      });
+  });
+});
+
+describe("GET /api/articles?topic=[field]", () => {
+  test("200: filters the articles by the topic value specified in the query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        for(let i=0; i<articles.length; i++){
+          expect(articles[i].topic).toBe('mitch')
+        }
       })
+  });
+  test("200: querying by a column name other than 'topic' defaults to returning all the articles", () => {
+    return request(app)
+      .get("/api/articles?title=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(data.articleData.length)
+      })
+  });
+  test("200: querying by a topic that doesn't exist returns an empty array", () => {
+    return request(app)
+      .get("/api/articles?topic=helsinki")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(0)
+      })
+  });
 
-      test("200: returns an array of all the articles, default sorted by created_at, in ascending order", () => {
-        return request(app)
-          .get("/api/articles?order=ASC")
-          .expect(200)
-          .then(({body: {articles}})=>{
-            for(let i=0; i<articles.length-1; i++){
-              expect(Date.parse(articles[i].created_at)).not.toBeGreaterThan(
-              Date.parse(articles[i + 1].created_at))
-            }
-            })
-        })
-
-
-        test("400: returns an error message if the 'order' term is neither ASC nor DESC", () => {
-          return request(app)
-            .get("/api/articles?order=XXX")
-            .expect(400)
-            .then(({body: {msg}})=>{
-              expect(msg).toBe(`syntax error, check query terms are valid`);
-              })
-          })
-
-          test("400: returns an error message if client tries to sort_by a non-existent column name", () => {
-            return request(app)
-              .get("/api/articles?sort_by=sauce")
-              .expect(400)
-              .then(({body: {msg}})=>{
-                expect(msg).toBe(`undefined column name`);
-                })
-            })
-
-            test("200: if client makes a query other than 'sort_by' (e.g. 'arrange_by') then the query is ignored, and sorting defaults to created_at DESC", () => {
-              return request(app)
-                .get("/api/articles?arrange_by=topic")
-                .expect(200)
-                .then(({body: {articles}})=>{
-                  for(let i=0; i<articles.length-1; i++){
-                    expect(Date.parse(articles[i].created_at)).not.toBeLessThan(
-                    Date.parse(articles[i + 1].created_at))
-                  }
-                  })
-              })
-            
-          
-        
 })
+
+
+// FEATURE REQUEST The endpoint should also accept the following query:
+
+// topic, which filters the articles by the topic value specified in the query. If the query is omitted, the endpoint should respond with all articles.
