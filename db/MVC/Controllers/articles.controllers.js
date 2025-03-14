@@ -31,8 +31,8 @@ const getArticles = (req, res, next) => {
   //if a specific article is requested
   if (article_id) {
     fetchSingleArticle(article_id)
-      .then((articles) => {
-        res.status(200).send({ articles: articles });
+      .then((article) => {
+        res.status(200).send({ articles: article });
       })
       .catch((err) => {
         next(err);
@@ -73,7 +73,6 @@ const getArticles = (req, res, next) => {
         res.status(200).send({ articles: articles });
       })
       .catch((err) => {
-        console.log(err, '<--- err-block in articles.controllers')
         next(err);
       });
   }
@@ -82,3 +81,4 @@ const getArticles = (req, res, next) => {
 
 
 module.exports = { getArticles, patchArticle };
+

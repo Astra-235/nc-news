@@ -38,7 +38,6 @@ const patchArticleVotes = (article_id, inc_votes) => {
 const fetchAllArticles = (fetchquery) => {
   return db.query(fetchquery)
   .then(({ rows }) => {
-    console.log(rows)
     return rows;
   });
 };
@@ -47,22 +46,20 @@ const fetchAllArticles = (fetchquery) => {
 
 const fetchSingleArticle = (article_id) => {
   return db
-    .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
-    .then((data) => {
-      //if the table does not contain an article with specified ID
-      if (data.rows.length === 0) {
+    .query("SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id", [article_id])
+    .then(({rows}) => {
+       //if the table does not contain an article with specified ID
+      if (rows.length === 0) {
         return Promise.reject({
           status: 404,
           msg: "No article with that article ID",
         });
         //if the table returns the specified article
       } else {
-        return data.rows[0];
+        return rows[0];
       }
     });
 };
 
-
-
-
 module.exports = { fetchAllArticles, fetchSingleArticle, patchArticleVotes };
+

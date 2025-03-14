@@ -472,10 +472,16 @@ describe("GET /api/articles?topic=[field]", () => {
         expect(articles.length).toBe(0)
       })
   });
-
 })
 
-
-// FEATURE REQUEST The endpoint should also accept the following query:
-
-// topic, which filters the articles by the topic value specified in the query. If the query is omitted, the endpoint should respond with all articles.
+describe("GET /api/articles:article_id", () => {
+  test("200: returned article includes a comment count", () => {
+    return request(app)
+      .get("/api/articles/2")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        console.log(articles, 'VVV')
+        expect(Object.keys(articles)).toContain("comment_count");
+      })
+      })
+  });
