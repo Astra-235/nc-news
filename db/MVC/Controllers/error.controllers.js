@@ -13,6 +13,13 @@ const handlePsqlErrors = (err, req, res, next) => {
     //NOT NULL VIOLATION - occurs when a column with a NOT NULL constraint is assigned a NULL value.
     } else if (err.code === '23502'){
         res.status(400).send({msg: `a NULL value has been assigned to a column with a NOT NULL contraint  e.g.no body submitted with a POST request`})
+    //path contains query terms which are not recognised by SQL (e.g. 'ASCENDING' rather than 'ASC' when requesting ordered search results)
+    } else if (err.code === '42601'){
+        res.status(400).send({msg: `syntax error, check query terms are valid`})
+    //path contains a query which references a non-existent column in the database tables
+    } else if (err.code === '42703'){
+        res.status(400).send({msg: `undefined column name`})
+
 
 
     } else {

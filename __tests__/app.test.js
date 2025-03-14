@@ -369,10 +369,77 @@ describe("GET /api/users", () => {
         expect(users.length).toBe(data.userData.length)
         }
       })
-
-
     })
-  })
+
+})
 
 
+describe("GET /api/articles?sort_by=[field]", () => {
+  test("200: returns an array of all the articles sorted by topic  descending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic&order=DESC")
+      .expect(200)
+      .then(({body: {articles}})=>{
+        for(let i=0; i<articles.length-1; i++){{
+          expect(articles[i].topic.charCodeAt(0)).not.toBeLessThan(articles[i+1].topic.charCodeAt(0));
+        }}
+        })
+    })
 
+    test("200: returns an array of all the articles sorted by title  ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=ASC")
+        .expect(200)
+        .then(({body: {articles}})=>{
+        for(let i=0; i<articles.length-1; i++){{
+         expect(articles[i].title.charCodeAt(0)).not.toBeGreaterThan(articles[i+1].title.charCodeAt(0));
+          }}
+          })
+      })
+
+      test("200: returns an array of all the articles, default sorted by created_at, in ascending order", () => {
+        return request(app)
+          .get("/api/articles?order=ASC")
+          .expect(200)
+          .then(({body: {articles}})=>{
+            for(let i=0; i<articles.length-1; i++){
+              expect(Date.parse(articles[i].created_at)).not.toBeGreaterThan(
+              Date.parse(articles[i + 1].created_at))
+            }
+            })
+        })
+
+
+        test("400: returns an error message if the 'order' term is neither ASC nor DESC", () => {
+          return request(app)
+            .get("/api/articles?order=XXX")
+            .expect(400)
+            .then(({body: {msg}})=>{
+              expect(msg).toBe(`syntax error, check query terms are valid`);
+              })
+          })
+
+          test("400: returns an error message if client tries to sort_by a non-existent column name", () => {
+            return request(app)
+              .get("/api/articles?sort_by=sauce")
+              .expect(400)
+              .then(({body: {msg}})=>{
+                expect(msg).toBe(`undefined column name`);
+                })
+            })
+
+            test("200: if client makes a query other than 'sort_by' (e.g. 'arrange_by') then the query is ignored, and sorting defaults to created_at DESC", () => {
+              return request(app)
+                .get("/api/articles?arrange_by=topic")
+                .expect(200)
+                .then(({body: {articles}})=>{
+                  for(let i=0; i<articles.length-1; i++){
+                    expect(Date.parse(articles[i].created_at)).not.toBeLessThan(
+                    Date.parse(articles[i + 1].created_at))
+                  }
+                  })
+              })
+            
+          
+        
+})
