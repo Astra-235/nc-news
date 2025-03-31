@@ -1,3 +1,4 @@
+const cors = require('cors')
 const express = require('express')
 const getApiEndpoints = require('./db/MVC/Controllers/api.controllers.js')
 const getTopics = require('./db/MVC/Controllers/topics.controllers.js')
@@ -6,9 +7,13 @@ const {getComments, postComments, deleteComment} = require('./db/MVC/Controllers
 const {handleNoEndpoint, handleCustomErrors, handlePsqlErrors} = require('./db/MVC/Controllers/error.controllers.js')
 const {getUsers} = require('./db/MVC/Controllers/users.controllers.js')
 
+
+
 const app = express()
 
 app.use(express.json())
+app.use(cors());
+
 
 //endpoints
 app.get('/api', getApiEndpoints)
